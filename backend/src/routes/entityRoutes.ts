@@ -11,4 +11,4 @@ router.get('/entities/:id', (req, res) => entityController.getEntityById(req, re
 router.put('/entities/:id', (req, res) => entityController.updateEntity(req, res));
 router.delete('/entities/:id', (req, res) => entityController.deleteEntity(req, res));
 
-export default router;
+export default router; // Export router as default
