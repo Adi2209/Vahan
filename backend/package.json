@@ -15,6 +15,7 @@
     "@types/node": "^20.12.11",
     "@types/sequelize": "^4.28.20",
     "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
     "express": "^4.19.2",
     "nodemon": "^3.1.0",
     "pg": "^8.11.5",
@@ -23,6 +24,7 @@
     "typescript": "^5.4.5"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "ts-node": "^10.9.2"
   }
 }

@@ -10,5 +10,7 @@ router.get('/entities', (req, res) => entityController.getAllEntities(req, res))
 router.get('/entities/:id', (req, res) => entityController.getEntityById(req, res));
 router.put('/entities/:id', (req, res) => entityController.updateEntity(req, res));
 router.delete('/entities/:id', (req, res) => entityController.deleteEntity(req, res));
+router.post('/entities/:id/examples', (req, res) => entityController.createExampleForEntity(req,res));
+
 
 export default router; // Export router as default

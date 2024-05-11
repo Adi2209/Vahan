@@ -2,12 +2,14 @@ import bodyParser from "body-parser";
 import express, { Application } from "express";
 import entityRoutes from "./routes/entityRoutes"; // Import entityRoutes
 import { testConnection } from "./configuration/database";
+import cors from "cors";
 
 const app: Application = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(bodyParser.json());
+app.use(cors()); // Use cors middleware to enable CORS
 
 // Routes
 app.use('/api', entityRoutes);
