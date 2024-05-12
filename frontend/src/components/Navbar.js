@@ -12,6 +12,7 @@ function ColorSchemesExample() {
   const [formData, setFormData] = useState({});
   const [showForm, setShowForm] = useState(false);
 
+  // Fetch list of all entities
   const fetchEntities = async () => {
     try {
       const response = await axios.get('http://localhost:3001/api/entities');
@@ -22,6 +23,16 @@ function ColorSchemesExample() {
     }
   };
 
+  // Fetch details of a specific entity
+  const fetchEntity = async (entityId) => {
+    try {
+      const response = await axios.get(`http://localhost:3001/api/entities/${entityId}`);
+      setSelectedEntity(response.data);
+    } catch (error) {
+      console.error('Error fetching entity:', error);
+    }
+  };
+
   useEffect(() => {
     fetchEntities();
   }, []);
@@ -29,7 +40,8 @@ function ColorSchemesExample() {
   const handleEntityClick = (entity) => {
     setSelectedEntity(entity);
     setFormData({});
-    setShowForm(false);
+    setShowForm(true);
+    fetchEntity(entity.id);
   };
 
   const handleChange = (e, attributeName) => {
@@ -38,21 +50,19 @@ function ColorSchemesExample() {
       [attributeName]: e.target.value
     });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitting form...');
     try {
       await axios.post(`http://localhost:3001/api/entities/${selectedEntity.id}/examples`, formData);
-      console.log('Example created successfully.');
-      handleEntityClick(selectedEntity);
+      fetchEntity(selectedEntity.id); // Refresh entity data after adding example
     } catch (error) {
       console.error('Error creating example:', error);
     }
   };
-  
 
   return (
-    <div>
+    <div className="main-content">
       <Navbar bg="dark" variant="dark">
         <Container>
           <Navbar.Brand href="#home">Vahan</Navbar.Brand>
@@ -62,40 +72,54 @@ function ColorSchemesExample() {
         </Container>
       </Navbar>
 
-      <Container className="mt-3">
-        <div className="d-flex justify-content-center">
-          <div style={{ flex: 1, marginRight: '20px' }}>
+      <Container fluid>
+        <div className="row">
+          <div className="col-md-2 entities-list">
             <h1>Entities</h1>
             <ul>
               {entitiesResponse.map(entity => (
-                <h3 key={entity.id}>
-                  <li onClick={() => handleEntityClick(entity)}>{entity.name}</li>
-                </h3>
+                <li key={entity.id} onClick={() => handleEntityClick(entity)}>{entity.name}</li>
               ))}
             </ul>
           </div>
 
           {selectedEntity && (
-            <div className="side-space d-flex flex-column justify-content-between">
-              <div>
-                <h2>Details</h2>
-                <p>ID: {selectedEntity.id}</p>
-                <p>Name: {selectedEntity.name}</p>
-                <h3>Attributes:</h3>
-                <ul>
-                  {Object.entries(selectedEntity.attributes).map(([attributeName, attributeDetails]) => (
-                    <li key={attributeName}>
-                      <strong>{attributeName}</strong>: {attributeDetails.type} {attributeDetails.required ? '(required)' : ''}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <Button className="btn btn-primary" onClick={() => setShowForm(true)}>Create</Button>
+            <div className="col-md-3 details-section">
+              <h2>Details</h2>
+              <p>ID: {selectedEntity.id}</p>
+              <p>Name: {selectedEntity.name}</p>
+              <ul>
+                {Object.entries(selectedEntity.attributes).map(([attributeName, attributeDetails]) => (
+                  <li key={attributeName}>
+                    <strong>{attributeName}</strong>: {attributeDetails.type} {attributeDetails.required ? '(required)' : ''}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
-          {selectedEntity && showForm && (
-            <div className="mt-5">
+          {selectedEntity && selectedEntity.examples && (
+            <div className="col-md-3 examples-section">
+              <h2>Examples</h2>
+              <table className="table">
+                <thead>
+                  <tr>
+                    {Object.keys(selectedEntity.examples[0]).map(key => <th key={key}>{key}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedEntity.examples.map((example, index) => (
+                    <tr key={index}>
+                      {Object.values(example).map((value, index) => <td key={index}>{value}</td>)}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {showForm && (
+            <div className="col-md-4 form-section">
               <h2>Create Example</h2>
               <Form onSubmit={handleSubmit}>
                 {Object.entries(selectedEntity.attributes).map(([attributeName, attributeDetails]) => (
@@ -111,31 +135,6 @@ function ColorSchemesExample() {
                 ))}
                 <Button type="submit" className="btn btn-primary">Submit</Button>
               </Form>
-            </div>
-          )}
-
-          {/* Examples table */}
-          {selectedEntity && selectedEntity.examples.length > 0 && (
-            <div className="mt-5">
-              <h2>Examples</h2>
-              <table className="table">
-                <thead>
-                  <tr>
-                    {Object.keys(selectedEntity.examples[0]).map((key) => (
-                      <th key={key}>{key}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedEntity.examples.map((example, index) => (
-                    <tr key={index}>
-                      {Object.values(example).map((value, index) => (
-                        <td key={index}>{value}</td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           )}
         </div>
