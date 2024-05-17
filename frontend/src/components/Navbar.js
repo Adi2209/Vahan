@@ -7,6 +7,7 @@ function ColorSchemesExample() {
   const [selectedEntity, setSelectedEntity] = useState(null);
   const [formData, setFormData] = useState({});
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     const fetchEntities = async () => {
@@ -38,6 +39,23 @@ function ColorSchemesExample() {
     }
   };
 
+  const handleDeleteClick = (event, entity) => {
+    event.stopPropagation(); // Prevent click from triggering li onClick
+    setSelectedEntity(entity);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:3001/api/entities/${selectedEntity.id}`);
+      setShowDeleteModal(false);
+      setEntitiesResponse(entitiesResponse.filter(e => e.id !== selectedEntity.id));
+      setSelectedEntity(null);
+    } catch (error) {
+      console.error('Error deleting entity:', error);
+    }
+  };
+
   const handleChange = (e, attributeName) => {
     setFormData({
       ...formData,
@@ -50,14 +68,16 @@ function ColorSchemesExample() {
     try {
       await axios.post(`http://localhost:3001/api/entities/${selectedEntity.id}/examples`, formData);
       setShowModal(false); // Close modal on successful submission
-      // Optionally refresh entity data here
       handleEntityClick(selectedEntity); // Refresh data
     } catch (error) {
       console.error('Error creating example:', error);
     }
   };
 
-  const handleClose = () => setShowModal(false);
+  const handleClose = () => {
+    setShowModal(false);
+    setShowDeleteModal(false);
+  };
 
   return (
     <div className="main-content">
@@ -78,6 +98,8 @@ function ColorSchemesExample() {
               {entitiesResponse.map((entity) => (
                 <li key={entity.id} onClick={() => handleEntityClick(entity)}>
                   {entity.name}
+                  <Button variant="light" className="delete-button" onClick={(e) => handleDeleteClick(e, entity)}><i className="fas fa-trash"></i></Button>
+
                 </li>
               ))}
             </ul>
@@ -118,8 +140,8 @@ function ColorSchemesExample() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
-              </div>
+                </table
+                ></div>
             </div>
           )}
         </div>
@@ -149,6 +171,19 @@ function ColorSchemesExample() {
             </Button>
           </Form>
         </Modal.Body>
+      </Modal>
+
+      <Modal show={showDeleteModal} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete this entity?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>Cancel</Button>
+          <Button variant="danger" onClick={confirmDelete}>Delete</Button>
+        </Modal.Footer>
       </Modal>
     </div>
   );

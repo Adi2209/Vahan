@@ -1,8 +1,7 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
-    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family: "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   background-color: #f4f4f8;
   color: #333;
   -webkit-font-smoothing: antialiased;
@@ -74,14 +73,11 @@ body {
   }
 }
 
-h1,
-h2,
-h3 {
+h1, h2, h3 {
   color: #333;
 }
 
-ul,
-li {
+ul, li {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -102,8 +98,7 @@ li:hover {
   border-collapse: collapse;
 }
 
-.table th,
-.table td {
+.table th, .table td {
   border: 1px solid #dee2e6;
   padding: 8px;
 }
@@ -113,12 +108,18 @@ li:hover {
   color: white;
 }
 
-.examples-section {
-  flex: 0 0 40%;
-  background-color: #fff;
-  padding: 20px;
-  padding-bottom: 50px; /* Increased bottom padding */
-  padding-top: 40px; /* Increased top padding to make the heading visible */
-  border-left: 1px solid #dee2e6;
-  overflow-y: auto; /* Ensures this section can scroll independently if content overflows */
+button.delete-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: red;
+  margin-left: 2rem;
+}
+
+button.delete-button:focus {
+  outline: none;
+}
+
+i.fa-trash {
+  font-size: 1.2em;
 }
