@@ -113,7 +113,7 @@ button.delete-button {
   border: none;
   cursor: pointer;
   color: red;
-  margin-left: 2rem;
+  margin-left: 1px;
 }
 
 button.delete-button:focus {
