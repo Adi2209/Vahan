@@ -1,12 +1,18 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../configuration/database';
 
+/**
+ * Attributes for defining an Entity.
+ */
 interface EntityAttributes {
   name: string;
   attributes: any;
   examples?: any[];
 }
 
+/**
+ * Model representing an Entity.
+ */
 export class Entity extends Model<EntityAttributes> implements EntityAttributes {
   public id!: number;
   public name!: string;
@@ -17,6 +23,7 @@ export class Entity extends Model<EntityAttributes> implements EntityAttributes 
   public readonly updatedAt!: Date;
 }
 
+// Initialize the Entity model
 Entity.init(
   {
     name: {
