@@ -4,15 +4,17 @@ import { sequelize } from '../configuration/database';
 interface EntityAttributes {
   name: string;
   attributes: any;
-  examples?: any[]; // Add examples field
+  examples?: any[];
 }
 
 export class Entity extends Model<EntityAttributes> implements EntityAttributes {
+  public id!: number;
   public name!: string;
   public attributes!: any;
-  public examples!: any[]; // Add examples field
+  public examples!: any[];
 
-  // Other methods or associations can be defined here
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
 
 Entity.init(
@@ -26,13 +28,16 @@ Entity.init(
       allowNull: false,
     },
     examples: {
-      type: DataTypes.JSONB, // Store examples as JSONB
+      type: DataTypes.JSONB,
       allowNull: true,
-      defaultValue: [], // Default value as empty array
+      defaultValue: [],
     },
   },
   {
     sequelize,
     modelName: 'Entity',
+    timestamps: true,
   }
 );
+
+export default Entity;

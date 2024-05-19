@@ -39,23 +39,41 @@ export class EntityController {
     }
   }
 
-  // Update entity by ID and add example
+  // Update entity by ID and update a specific example
+  
   public async updateEntity(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { name, attributes, example } = req.body;
+      const { oldExample, newExample } = req.body;
+  
       const entity = await Entity.findByPk(id);
+  
       if (!entity) {
         res.status(404).json({ error: "Entity not found" });
-      } else {
-        if (example) {
-          entity.examples.push(example); // Add new example
-        }
-        await entity.update({ name, attributes, examples: entity.examples });
-        res.status(200).json(entity);
+        return;
       }
+  
+      const examples = entity.examples || [];
+      const exampleIndex = examples.findIndex((ex: any) => JSON.stringify(ex) === JSON.stringify(oldExample));
+  
+      if (exampleIndex === -1) {
+        res.status(404).json({ error: "Example not found" });
+        return;
+      }
+  
+      // Create a new array with the updated example
+      const updatedExamples = [...examples];
+      updatedExamples[exampleIndex] = newExample;
+  
+      // Use setDataValue to ensure the update is recognized
+      entity.setDataValue('examples', updatedExamples);
+      
+      await entity.save(); // This should now trigger an update with the new examples and updated timestamp
+  
+      res.status(200).json(entity);
     } catch (error) {
-      res.status(400).json({ error: error });
+      console.error("Error updating entity:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   }
 
@@ -75,35 +93,6 @@ export class EntityController {
     }
   }
 
-  // public async createExampleForEntity(req: Request, res: Response): Promise<void> {
-  //   try {
-  //     const { id } = req.params;
-  //     const exampleData = req.body;
-  //     if (!exampleData) {
-  //       res.status(400).json({ error: 'Example data is required' });
-  //       return;
-  //     }
-  //     const entity = await Entity.findByPk(id);
-  //     if (!entity) {
-  //       res.status(404).json({ error: 'Entity not found' });
-  //       return;
-  //     }
-
-  //     entity.examples.push(exampleData);
-  //     const updatedEntity = await entity.save();
-  //     if (!updatedEntity) {
-  //       res.status(500).json({ error: 'Failed to save entity' });
-  //       return;
-  //     }
-
-  //     res.status(201).json(updatedEntity);
-  //   } catch (error) {
-  //     console.error('Error creating example:', error);
-  //     res.status(500).json({ error: 'Internal server error' });
-  //   }
-  // }
-
-  // Assuming Entity model has a field 'examples' which is an array of JSON objects
   public async createExampleForEntity(
     req: Request,
     res: Response
@@ -131,4 +120,37 @@ export class EntityController {
       res.status(500).json({ error: "Internal server error" });
     }
   }
+
+  public async deleteExample(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { exampleToDelete } = req.body;  // Assuming the example to delete is passed in the request body
+  
+      const entity = await Entity.findByPk(id);
+  
+      if (!entity) {
+        res.status(404).json({ error: "Entity not found" });
+        return;
+      }
+  
+      let examples = entity.examples || [];
+      const exampleIndex = examples.findIndex((ex: any) => JSON.stringify(ex) === JSON.stringify(exampleToDelete));
+  
+      if (exampleIndex === -1) {
+        res.status(404).json({ error: "Example not found" });
+        return;
+      }
+  
+      examples = examples.filter((_, index) => index !== exampleIndex);
+  
+      entity.setDataValue('examples', examples);
+  
+      await entity.save(); 
+  
+      res.status(200).json({ message: "Example deleted successfully", entity });
+    } catch (error) {
+      console.error("Error deleting example:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }  
 }

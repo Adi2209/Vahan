@@ -4,6 +4,7 @@ import { Sequelize } from 'sequelize';
 export const sequelize = new Sequelize('Vahan', 'postgres', 'Testing1234', {
   host: 'localhost',
   dialect: 'postgres',
+  logging: console.log,
   port: 5432
 });
 
